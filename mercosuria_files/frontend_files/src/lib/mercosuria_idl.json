@@ -1,0 +1,316 @@
+{
+  "address": "MERCzKpGn4jqf9eFZSPVKMeS7WGmP4QhEGGdNLVwx1U",
+  "metadata": {
+    "name": "mercosuria",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Mercosuria LawTech — Solana smart contract for legal case management, escrow, and reputation"
+  },
+  "instructions": [
+    {
+      "name": "initialize_platform",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        { "name": "platform", "writable": true, "signer": false, "pda": { "seeds": [{ "kind": "const", "value": [112, 108, 97, 116, 102, 111, 114, 109] }] } },
+        { "name": "treasury" },
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [{ "name": "fee_bps", "type": "u64" }]
+    },
+    {
+      "name": "register_lawyer",
+      "discriminator": [57, 200, 128, 33, 119, 58, 73, 22],
+      "accounts": [
+        { "name": "lawyer_profile", "writable": true, "signer": false, "pda": { "seeds": [{ "kind": "const", "value": [108, 97, 119, 121, 101, 114] }, { "kind": "account", "path": "lawyer" }] } },
+        { "name": "lawyer_vault" },
+        { "name": "lawyer", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "name", "type": "string" },
+        { "name": "bar_number", "type": "string" },
+        { "name": "jurisdiction", "type": "string" },
+        { "name": "specialization", "type": "string" },
+        { "name": "hourly_rate_lamports", "type": "u64" }
+      ]
+    },
+    {
+      "name": "update_lawyer_profile",
+      "discriminator": [91, 5, 200, 14, 238, 73, 92, 188],
+      "accounts": [
+        { "name": "lawyer_profile", "writable": true, "signer": false },
+        { "name": "lawyer", "signer": true }
+      ],
+      "args": [
+        { "name": "hourly_rate_lamports", "type": { "option": "u64" } },
+        { "name": "is_active", "type": { "option": "bool" } }
+      ]
+    },
+    {
+      "name": "open_case",
+      "discriminator": [14, 222, 119, 45, 167, 203, 208, 109],
+      "accounts": [
+        { "name": "platform", "writable": true, "signer": false, "pda": { "seeds": [{ "kind": "const", "value": [112, 108, 97, 116, 102, 111, 114, 109] }] } },
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "case_escrow", "writable": true, "signer": false },
+        { "name": "client", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string" },
+        { "name": "case_type", "type": { "defined": { "name": "CaseType" } } },
+        { "name": "budget_lamports", "type": "u64" },
+        { "name": "deadline_ts", "type": "i64" }
+      ]
+    },
+    {
+      "name": "apply_to_case",
+      "discriminator": [200, 13, 91, 72, 44, 55, 198, 77],
+      "accounts": [
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "case_application", "writable": true, "signer": false },
+        { "name": "lawyer_profile", "signer": false },
+        { "name": "lawyer", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "proposal", "type": "string" },
+        { "name": "proposed_fee_lamports", "type": "u64" }
+      ]
+    },
+    {
+      "name": "accept_lawyer",
+      "discriminator": [122, 48, 205, 91, 33, 208, 119, 55],
+      "accounts": [
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "case_application", "writable": true, "signer": false },
+        { "name": "lawyer" },
+        { "name": "client", "signer": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "attach_document",
+      "discriminator": [188, 21, 144, 66, 77, 103, 91, 49],
+      "accounts": [
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "document_record", "writable": true, "signer": false },
+        { "name": "signer", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "doc_hash", "type": "string" },
+        { "name": "doc_title", "type": "string" },
+        { "name": "doc_type", "type": { "defined": { "name": "DocumentType" } } }
+      ]
+    },
+    {
+      "name": "release_payment",
+      "discriminator": [109, 115, 220, 111, 45, 99, 88, 12],
+      "accounts": [
+        { "name": "platform", "signer": false },
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "case_escrow", "writable": true, "signer": false },
+        { "name": "lawyer_profile", "writable": true, "signer": false },
+        { "name": "lawyer_wallet", "writable": true },
+        { "name": "treasury", "writable": true },
+        { "name": "client", "signer": true }
+      ],
+      "args": [{ "name": "amount_lamports", "type": "u64" }]
+    },
+    {
+      "name": "close_case",
+      "discriminator": [44, 200, 118, 89, 52, 13, 75, 201],
+      "accounts": [
+        { "name": "platform", "writable": true, "signer": false },
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "case_escrow", "writable": true, "signer": false },
+        { "name": "lawyer_profile", "writable": true, "signer": false },
+        { "name": "client", "writable": true, "signer": true }
+      ],
+      "args": [
+        { "name": "outcome", "type": { "defined": { "name": "CaseOutcome" } } },
+        { "name": "resolution_notes", "type": "string" }
+      ]
+    },
+    {
+      "name": "submit_review",
+      "discriminator": [78, 88, 31, 201, 44, 109, 215, 7],
+      "accounts": [
+        { "name": "legal_case", "signer": false },
+        { "name": "lawyer_review", "writable": true, "signer": false },
+        { "name": "lawyer_profile", "writable": true, "signer": false },
+        { "name": "lawyer" },
+        { "name": "client", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [
+        { "name": "rating", "type": "u8" },
+        { "name": "comment", "type": "string" }
+      ]
+    },
+    {
+      "name": "raise_dispute",
+      "discriminator": [55, 89, 143, 211, 76, 22, 190, 34],
+      "accounts": [
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "dispute", "writable": true, "signer": false },
+        { "name": "signer", "writable": true, "signer": true },
+        { "name": "system_program", "address": "11111111111111111111111111111111" }
+      ],
+      "args": [{ "name": "reason", "type": "string" }]
+    },
+    {
+      "name": "resolve_dispute",
+      "discriminator": [191, 55, 101, 222, 33, 78, 115, 44],
+      "accounts": [
+        { "name": "platform", "signer": false },
+        { "name": "legal_case", "writable": true, "signer": false },
+        { "name": "dispute", "writable": true, "signer": false },
+        { "name": "case_escrow", "writable": true, "signer": false },
+        { "name": "lawyer_profile", "writable": true, "signer": false },
+        { "name": "client", "writable": true },
+        { "name": "lawyer_wallet", "writable": true },
+        { "name": "treasury", "writable": true },
+        { "name": "authority", "signer": true }
+      ],
+      "args": [
+        { "name": "ruling", "type": { "defined": { "name": "DisputeRuling" } } },
+        { "name": "notes", "type": "string" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PlatformState",
+      "discriminator": [77, 200, 34, 109, 55, 89, 143, 211]
+    },
+    {
+      "name": "LawyerProfile",
+      "discriminator": [33, 119, 58, 73, 22, 57, 200, 128]
+    },
+    {
+      "name": "LegalCase",
+      "discriminator": [45, 167, 203, 208, 109, 14, 222, 119]
+    },
+    {
+      "name": "CaseApplication",
+      "discriminator": [55, 198, 77, 200, 13, 91, 72, 44]
+    },
+    {
+      "name": "DocumentRecord",
+      "discriminator": [103, 91, 49, 188, 21, 144, 66, 77]
+    },
+    {
+      "name": "LawyerReview",
+      "discriminator": [215, 7, 78, 88, 31, 201, 44, 109]
+    },
+    {
+      "name": "Dispute",
+      "discriminator": [190, 34, 55, 89, 143, 211, 76, 22]
+    }
+  ],
+  "types": [
+    {
+      "name": "CaseType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ContractDispute" },
+          { "name": "IntellectualProperty" },
+          { "name": "CommercialLaw" },
+          { "name": "LaborLaw" },
+          { "name": "ConsumerProtection" },
+          { "name": "RegulatoryCompliance" },
+          { "name": "ArbitrationMercosur" },
+          { "name": "TradeLaw" },
+          { "name": "Other" }
+        ]
+      }
+    },
+    {
+      "name": "CaseStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Open" },
+          { "name": "InProgress" },
+          { "name": "Disputed" },
+          { "name": "Closed" }
+        ]
+      }
+    },
+    {
+      "name": "CaseOutcome",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ClientWon" },
+          { "name": "ClientLost" },
+          { "name": "SettledAmicably" },
+          { "name": "Dismissed" }
+        ]
+      }
+    },
+    {
+      "name": "DocumentType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Contract" },
+          { "name": "Evidence" },
+          { "name": "LegalBrief" },
+          { "name": "CourtOrder" },
+          { "name": "Settlement" },
+          { "name": "InvoiceReceipt" },
+          { "name": "IdentityDocument" },
+          { "name": "Other" }
+        ]
+      }
+    },
+    {
+      "name": "DisputeRuling",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FavorClient" },
+          { "name": "FavorLawyer" },
+          { "name": "SplitEvenly" }
+        ]
+      }
+    }
+  ],
+  "events": [
+    { "name": "PlatformInitialized", "discriminator": [77, 200, 34, 109, 55, 89, 143, 0] },
+    { "name": "LawyerRegistered",    "discriminator": [33, 119, 58,  73, 22, 57, 200, 1] },
+    { "name": "CaseOpened",          "discriminator": [45, 167, 203, 208, 109, 14, 222, 2] },
+    { "name": "LawyerApplied",       "discriminator": [55, 198, 77, 200, 13, 91, 72, 3] },
+    { "name": "LawyerAccepted",      "discriminator": [122, 48, 205, 91, 33, 208, 119, 4] },
+    { "name": "DocumentAttached",    "discriminator": [188, 21, 144, 66, 77, 103, 91, 5] },
+    { "name": "PaymentReleased",     "discriminator": [109, 115, 220, 111, 45, 99, 88, 6] },
+    { "name": "CaseClosed",          "discriminator": [44, 200, 118, 89, 52, 13, 75, 7] },
+    { "name": "ReviewSubmitted",     "discriminator": [78, 88, 31, 201, 44, 109, 215, 8] },
+    { "name": "DisputeRaised",       "discriminator": [55, 89, 143, 211, 76, 22, 190, 9] },
+    { "name": "DisputeResolved",     "discriminator": [191, 55, 101, 222, 33, 78, 115, 10] }
+  ],
+  "errors": [
+    { "code": 6000, "name": "FeeTooHigh",          "msg": "Fee basis points too high (max 1000 = 10%)" },
+    { "code": 6001, "name": "StringTooLong",        "msg": "String exceeds maximum length" },
+    { "code": 6002, "name": "InvalidAmount",        "msg": "Amount must be greater than zero" },
+    { "code": 6003, "name": "InsufficientStake",    "msg": "Insufficient stake — must stake at least 1 SOL" },
+    { "code": 6004, "name": "CaseNotOpen",          "msg": "Case is not open for applications" },
+    { "code": 6005, "name": "FeeExceedsBudget",     "msg": "Proposed fee exceeds case budget" },
+    { "code": 6006, "name": "LawyerNotActive",      "msg": "Lawyer profile is not active" },
+    { "code": 6007, "name": "Unauthorized",         "msg": "Unauthorized — signer is not the authorized party" },
+    { "code": 6008, "name": "CaseNotInProgress",    "msg": "Case is not currently in progress" },
+    { "code": 6009, "name": "InsufficientEscrow",   "msg": "Insufficient funds in escrow" },
+    { "code": 6010, "name": "CaseAlreadyClosed",    "msg": "Case has already been closed" },
+    { "code": 6011, "name": "CaseNotClosed",        "msg": "Case is not closed" },
+    { "code": 6012, "name": "NotDisputed",          "msg": "Case is not under dispute" },
+    { "code": 6013, "name": "InvalidRating",        "msg": "Rating must be between 1 and 5" },
+    { "code": 6014, "name": "InvalidDeadline",      "msg": "Deadline must be in the future" },
+    { "code": 6015, "name": "TooManyDocuments",     "msg": "Maximum number of documents reached" }
+  ]
+}
